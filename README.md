@@ -13,6 +13,7 @@
 - MVC.
 - Swegger 3.
 - H2 database.
+- Lombok.
 
 # project execution
 
