@@ -21,7 +21,7 @@
 
 ```bash
 # clone repository
-git clone https://github.com/abnerjosefelixbarbosa/cryptography.git
+git clone https://github.com/abnerjosefelixbarbosa/exchange-rate-challenge.git
 ```
 
 # author 
