@@ -1,4 +1,4 @@
-package com.org.backendjava.controller;
+package com.org.backendjava.controllers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -20,7 +20,7 @@ public class RateControllerTest {
 	
 	@Test
 	public void shouldProvideHistoricalExchangeRateAndReturn200Status() throws Exception {
-		mockMvc.perform(get("/api/rate/historical-exchange"))
+		mockMvc.perform(get("/api/rate/historical-exchange?firstCurrency=USD&secondCurrency=BRL&numberDays=90"))
 		.andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(print());
 	}
