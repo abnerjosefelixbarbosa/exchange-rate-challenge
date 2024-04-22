@@ -1,14 +1,19 @@
 package com.org.backendjava.services;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.org.backendjava.dto.CurrencyDailyView;
 import com.org.backendjava.dto.CurrencyView;
 import com.org.backendjava.dto.DailyView;
 import com.org.backendjava.exception.NotFoundException;
@@ -17,36 +22,54 @@ import com.org.backendjava.exception.NotFoundException;
 public class APIService extends Thread {
 	// https://docs.awesomeapi.com.br/api-de-moedas
 
-	public List<DailyView> provideHistoricalExchangeRate(String firstCurrency, String secondCurrency, Long numberDays) {
+	public Page<DailyView> provideHistoricalExchangeRate(String firstCurrency, String secondCurrency, Long numberDays,
+			Pageable pageable) {
+		Collection<DailyView> dailyViews = new ArrayList<DailyView>();
+		DailyView dailyView = new DailyView();
+		CurrencyView currencyView = new CurrencyView();
+		CurrencyDailyView currencyDailyView = new CurrencyDailyView();
 		RestTemplate restTemplate = new RestTemplate();
-		List<DailyView> dailyViews = new ArrayList<DailyView>();
+		ObjectMapper objectMapper = new ObjectMapper();
 
 		try {
 			final String URL = String.format("https://economia.awesomeapi.com.br/json/daily/%s-%s/%d", firstCurrency,
 					secondCurrency, numberDays);
-			DailyView[] objects = restTemplate.getForObject(URL, DailyView[].class);
-			
-			for (DailyView i : objects) {
-				System.out.println(i);
+			Object object = restTemplate.getForObject(URL, Object.class);
+			JsonNode jsonNode = objectMapper.readTree(objectMapper.writeValueAsString(object));
+
+			for (int i = 0; i < jsonNode.withArray("").size(); i++) {
+				ObjectNode objectNode = (ObjectNode) jsonNode.get(i);
+
+				if (i != 0) {
+					currencyDailyView.setCurrencyDailyView(objectNode);
+				}
+				
+				dailyView.setCurrencyDailyView(currencyDailyView);
+				dailyViews.add(dailyView);
 			}
 
-			//System.out.println(objects);
-
-
-			// sleep(3000);
+			sleep(3000);
 		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
+            String message = e.getMessage();
+			
+			if (message.contains("404")) {
+				throw new NotFoundException("moeda nao encontrada");
+			} else {
+				throw new RuntimeException(e.getMessage());
+			}
+			
 		}
-
-		// DataView object = restTemplate.getForObject(URL, DataView.class);
-		// List<DataView> dataViews = new ArrayList<DataView>();
-
-		return dailyViews;
+		
+		int start = (int) pageable.getOffset();
+	    int end = Math.min((start + pageable.getPageSize()), dailyViews.size());
+		List<DailyView> list = new ArrayList<DailyView>(dailyViews)
+				.subList(start, end);
+		return new PageImpl<DailyView>(list, pageable, list.size());
 	}
 
 	public CurrencyView provideLatestCurrencyRate(String firstCurrency, String secondCurrency) {
-		RestTemplate restTemplate = new RestTemplate();
 		CurrencyView currencyView = new CurrencyView();
+		RestTemplate restTemplate = new RestTemplate();
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		try {
@@ -63,11 +86,13 @@ public class APIService extends Thread {
 
 			sleep(3000);
 		} catch (Exception e) {
-			if (e.getMessage().equals(
-					"404 Not Found: \"{\"status\":404,\"code\":\"CoinNotExists\",\"message\":\"moeda nao encontrada USD-BR\"}\"")) {
+			String message = e.getMessage();
+			
+			if (message.contains("404")) {
 				throw new NotFoundException("moeda nao encontrada");
+			} else {
+				throw new RuntimeException(e.getMessage());
 			}
-			throw new RuntimeException(e.getMessage());
 		}
 
 		return currencyView;

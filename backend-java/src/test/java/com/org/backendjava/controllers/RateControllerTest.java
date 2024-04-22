@@ -20,7 +20,7 @@ public class RateControllerTest {
 	
 	@Test
 	public void shouldProvideHistoricalExchangeRateAndReturn200Status() throws Exception {
-		mockMvc.perform(get("/api/rate/historical-exchange?firstCurrency=USD&secondCurrency=BRL&numberDays=90"))
+		mockMvc.perform(get("/api/rate/historical-exchange?firstCurrency=USD&secondCurrency=BRL&numberDays=10"))
 		.andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(print());
 	}

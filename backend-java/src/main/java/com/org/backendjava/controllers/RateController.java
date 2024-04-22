@@ -1,8 +1,8 @@
 package com.org.backendjava.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +20,10 @@ public class RateController {
 	private RateService rateService;
 
 	@GetMapping("/historical-exchange")
-	public ResponseEntity<List<DailyView>> provideHistoricalExchangeRate(@RequestParam String firstCurrency,
-			@RequestParam String secondCurrency, @RequestParam Long numberDays) {
-		List<DailyView> dailyViews = rateService.provideHistoricalExchangeRate(firstCurrency, secondCurrency, numberDays);
-		return ResponseEntity.status(200).body(dailyViews);
+	public ResponseEntity<Page<DailyView>> provideHistoricalExchangeRate(@RequestParam String firstCurrency,
+			@RequestParam String secondCurrency, @RequestParam Long numberDays, Pageable pageable) {
+		Page<DailyView> page = rateService.provideHistoricalExchangeRate(firstCurrency, secondCurrency, numberDays, pageable);
+		return ResponseEntity.status(200).body(page);
 	}
 
 	@GetMapping("/latest-currency")
