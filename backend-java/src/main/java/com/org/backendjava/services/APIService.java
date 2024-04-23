@@ -2,6 +2,7 @@ package com.org.backendjava.services;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -24,31 +25,49 @@ public class APIService extends Thread {
 
 	public Page<DailyView> provideHistoricalExchangeRate(String firstCurrency, String secondCurrency, Long numberDays,
 			Pageable pageable) {
-		Collection<DailyView> dailyViews = new ArrayList<DailyView>();
+		List<DailyView> dailyViews = new LinkedList<DailyView>();
 		DailyView dailyView = new DailyView();
 		CurrencyView currencyView = new CurrencyView();
 		CurrencyDailyView currencyDailyView = new CurrencyDailyView();
 		RestTemplate restTemplate = new RestTemplate();
 		ObjectMapper objectMapper = new ObjectMapper();
+		Page<DailyView> page = null;
 
 		try {
 			final String URL = String.format("https://economia.awesomeapi.com.br/json/daily/%s-%s/%d", firstCurrency,
 					secondCurrency, numberDays);
 			Object object = restTemplate.getForObject(URL, Object.class);
 			JsonNode jsonNode = objectMapper.readTree(objectMapper.writeValueAsString(object));
-
+			
+			//System.out.println(jsonNode.withArray("").size());
+			
 			for (int i = 0; i < jsonNode.withArray("").size(); i++) {
 				ObjectNode objectNode = (ObjectNode) jsonNode.get(i);
-
-				if (i != 0) {
+				
+				if (i == 0) {
+					//System.out.println(objectNode);
+				} else {
+					//System.out.println(objectNode);
 					currencyDailyView.setCurrencyDailyView(objectNode);
+					dailyView.setCurrencyDailyView(currencyDailyView);
 				}
 				
-				dailyView.setCurrencyDailyView(currencyDailyView);
 				dailyViews.add(dailyView);
+				page = new PageImpl<DailyView>(dailyViews, pageable, dailyViews.size());
+				//System.out.println(dailyViews.toString());
+			}
+			
+			//System.out.println(dailyViews.toString());
+			
+			//for (DailyView obj : dailyViews) {
+				//System.out.println(obj.toString());
+			//}
+			
+			for (int i = 0; i < dailyViews.size(); i++) {
+				//System.out.println(dailyViews.get(i));
 			}
 
-			sleep(3000);
+			//sleep(3000);
 		} catch (Exception e) {
             String message = e.getMessage();
 			
@@ -62,9 +81,10 @@ public class APIService extends Thread {
 		
 		int start = (int) pageable.getOffset();
 	    int end = Math.min((start + pageable.getPageSize()), dailyViews.size());
-		List<DailyView> list = new ArrayList<DailyView>(dailyViews)
-				.subList(start, end);
-		return new PageImpl<DailyView>(list, pageable, list.size());
+		//List<DailyView> list = new ArrayList<DailyView>(dailyViews).subList(start, end);
+		
+		//
+		return page;
 	}
 
 	public CurrencyView provideLatestCurrencyRate(String firstCurrency, String secondCurrency) {
