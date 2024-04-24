@@ -6,14 +6,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.org.backendjava.dto.CurrencyView;
-import com.org.backendjava.dto.DailyView;
 
 @Service
 public class RateService {
 	@Autowired
 	private APIService apiService;
 
-	public Page<DailyView> provideHistoricalExchangeRate(String firstCurrency, String secondCurrency, Long numberDays,
+	public Page<Object> provideHistoricalExchangeRate(String firstCurrency, String secondCurrency, Long numberDays,
 			Pageable pageable) {
 		return apiService.provideHistoricalExchangeRate(firstCurrency, secondCurrency, numberDays, pageable);
 	}

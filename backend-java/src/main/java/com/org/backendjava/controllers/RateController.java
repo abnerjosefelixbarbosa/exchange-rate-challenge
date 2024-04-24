@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.org.backendjava.dto.CurrencyView;
-import com.org.backendjava.dto.DailyView;
 import com.org.backendjava.services.RateService;
 
 @RestController
@@ -20,10 +19,10 @@ public class RateController {
 	private RateService rateService;
 
 	@GetMapping("/historical-exchange")
-	public ResponseEntity<Page<DailyView>> provideHistoricalExchangeRate(@RequestParam String firstCurrency,
+	public ResponseEntity<Page<Object>> provideHistoricalExchangeRate(@RequestParam String firstCurrency,
 			@RequestParam String secondCurrency, @RequestParam Long numberDays, Pageable pageable) {
-		Page<DailyView> page = rateService.provideHistoricalExchangeRate(firstCurrency, secondCurrency, numberDays, pageable);
-		return ResponseEntity.status(200).body(page);
+		Page<Object> dailyViews = rateService.provideHistoricalExchangeRate(firstCurrency, secondCurrency, numberDays, pageable);
+		return ResponseEntity.status(200).body(dailyViews);
 	}
 
 	@GetMapping("/latest-currency")

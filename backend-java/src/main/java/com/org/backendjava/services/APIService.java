@@ -1,8 +1,6 @@
 package com.org.backendjava.services;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -14,24 +12,18 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.org.backendjava.dto.CurrencyDailyView;
 import com.org.backendjava.dto.CurrencyView;
-import com.org.backendjava.dto.DailyView;
 import com.org.backendjava.exception.NotFoundException;
 
 @Service
 public class APIService extends Thread {
 	// https://docs.awesomeapi.com.br/api-de-moedas
 
-	public Page<DailyView> provideHistoricalExchangeRate(String firstCurrency, String secondCurrency, Long numberDays,
+	public Page<Object> provideHistoricalExchangeRate(String firstCurrency, String secondCurrency, Long numberDays,
 			Pageable pageable) {
-		List<DailyView> dailyViews = new LinkedList<DailyView>();
-		DailyView dailyView = new DailyView();
-		CurrencyView currencyView = new CurrencyView();
-		CurrencyDailyView currencyDailyView = new CurrencyDailyView();
+		List<Object> objects = new ArrayList<Object>();
 		RestTemplate restTemplate = new RestTemplate();
 		ObjectMapper objectMapper = new ObjectMapper();
-		Page<DailyView> page = null;
 
 		try {
 			final String URL = String.format("https://economia.awesomeapi.com.br/json/daily/%s-%s/%d", firstCurrency,
@@ -39,35 +31,12 @@ public class APIService extends Thread {
 			Object object = restTemplate.getForObject(URL, Object.class);
 			JsonNode jsonNode = objectMapper.readTree(objectMapper.writeValueAsString(object));
 			
-			//System.out.println(jsonNode.withArray("").size());
-			
 			for (int i = 0; i < jsonNode.withArray("").size(); i++) {
 				ObjectNode objectNode = (ObjectNode) jsonNode.get(i);
-				
-				if (i == 0) {
-					//System.out.println(objectNode);
-				} else {
-					//System.out.println(objectNode);
-					currencyDailyView.setCurrencyDailyView(objectNode);
-					dailyView.setCurrencyDailyView(currencyDailyView);
-				}
-				
-				dailyViews.add(dailyView);
-				page = new PageImpl<DailyView>(dailyViews, pageable, dailyViews.size());
-				//System.out.println(dailyViews.toString());
+				objects.add(objectNode);
 			}
 			
-			//System.out.println(dailyViews.toString());
-			
-			//for (DailyView obj : dailyViews) {
-				//System.out.println(obj.toString());
-			//}
-			
-			for (int i = 0; i < dailyViews.size(); i++) {
-				//System.out.println(dailyViews.get(i));
-			}
-
-			//sleep(3000);
+			sleep(3000);
 		} catch (Exception e) {
             String message = e.getMessage();
 			
@@ -76,15 +45,13 @@ public class APIService extends Thread {
 			} else {
 				throw new RuntimeException(e.getMessage());
 			}
-			
 		}
 		
 		int start = (int) pageable.getOffset();
-	    int end = Math.min((start + pageable.getPageSize()), dailyViews.size());
-		//List<DailyView> list = new ArrayList<DailyView>(dailyViews).subList(start, end);
-		
-		//
-		return page;
+	    int end = Math.min((start + pageable.getPageSize()), objects.size());
+	    List<Object> pageContent = objects.subList(start, end);
+	    
+		return new PageImpl<Object>(pageContent, pageable, objects.size());
 	}
 
 	public CurrencyView provideLatestCurrencyRate(String firstCurrency, String secondCurrency) {
