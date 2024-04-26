@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.org.backendjava.dto.CurrencyView;
 import com.org.backendjava.exception.NotFoundException;
 
 @Service
@@ -54,22 +53,14 @@ public class APIService extends Thread {
 		return new PageImpl<Object>(pageContent, pageable, objects.size());
 	}
 
-	public CurrencyView provideLatestCurrencyRate(String firstCurrency, String secondCurrency) {
-		CurrencyView currencyView = new CurrencyView();
+	public Object provideLatestCurrencyRate(String firstCurrency, String secondCurrency) {
 		RestTemplate restTemplate = new RestTemplate();
-		ObjectMapper objectMapper = new ObjectMapper();
+		Object object = null;
 
 		try {
 			final String URL = String.format("https://economia.awesomeapi.com.br/json/last/%s-%s", firstCurrency,
 					secondCurrency);
-			Object object = restTemplate.getForObject(URL, Object.class);
-			JsonNode jsonNode = objectMapper.readTree(objectMapper.writeValueAsString(object));
-
-			ObjectNode objectNode = (ObjectNode) jsonNode.get(String.format("%s%s", firstCurrency, secondCurrency));
-
-			if (objectNode != null && objectNode.isObject()) {
-				currencyView.setCurrencyView(objectNode);
-			}
+			object = restTemplate.getForObject(URL, Object.class);
 
 			sleep(3000);
 		} catch (Exception e) {
@@ -82,6 +73,6 @@ public class APIService extends Thread {
 			}
 		}
 
-		return currencyView;
+		return object;
 	}
 }

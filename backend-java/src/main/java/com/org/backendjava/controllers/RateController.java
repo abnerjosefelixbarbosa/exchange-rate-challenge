@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.org.backendjava.dto.CurrencyView;
 import com.org.backendjava.services.RateService;
 
 @RestController
@@ -26,9 +25,9 @@ public class RateController {
 	}
 
 	@GetMapping("/latest-currency")
-	public ResponseEntity<CurrencyView> provideLatestCurrencyRate(@RequestParam String firstCurrency,
+	public ResponseEntity<Object> provideLatestCurrencyRate(@RequestParam String firstCurrency,
 			@RequestParam String secondCurrency) {
-		CurrencyView currencyView = rateService.provideLatestCurrencyRate(firstCurrency, secondCurrency);
-		return ResponseEntity.status(200).body(currencyView);
+		Object object = rateService.provideLatestCurrencyRate(firstCurrency, secondCurrency);
+		return ResponseEntity.status(200).body(object);
 	}
 }

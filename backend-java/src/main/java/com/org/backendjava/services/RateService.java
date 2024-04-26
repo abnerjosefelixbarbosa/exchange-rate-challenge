@@ -5,8 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.org.backendjava.dto.CurrencyView;
-
 @Service
 public class RateService {
 	@Autowired
@@ -17,7 +15,7 @@ public class RateService {
 		return apiService.provideHistoricalExchangeRate(firstCurrency, secondCurrency, numberDays, pageable);
 	}
 
-	public CurrencyView provideLatestCurrencyRate(String firstCurrency, String secondCurrency) {
+	public Object provideLatestCurrencyRate(String firstCurrency, String secondCurrency) {
 		return apiService.provideLatestCurrencyRate(firstCurrency, secondCurrency);
 	}
 }
