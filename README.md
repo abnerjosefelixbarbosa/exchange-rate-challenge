@@ -1,12 +1,12 @@
 # exchange-rate-challenge
 
-# Sobre
+## Sobre
 
 Desavio exchange rate
 
-# Link do desafio
+## Modelo
 
-[link](https://github.com/AfterShip/challenge/blob/software-engineer/coding-challenge.md)
+
 
 # Recursos do projeto
 
