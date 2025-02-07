@@ -6,7 +6,7 @@ Desavio exchange rate
 
 ## Modelo
 
-
+![Image](https://github.com/user-attachments/assets/7ba024cc-e42f-4f4c-9bb0-1c19684a6ccc)
 
 # Recursos do projeto
 
